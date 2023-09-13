@@ -1,0 +1,57 @@
+﻿@page "/"
+@using Data
+@inject IIonosferaService service
+
+<div>
+    @if (
+    Records == null
+    || Records.Records == null
+    || 
+    !Records.Records.Any()
+    )
+    {
+        <p>No hay datos para mostrar</p>
+    }
+    else
+    {
+        
+    @foreach (Record record in Records.Records)
+        {
+            @if (record != null)
+            {
+                <dl>
+                    @foreach (var property in record.GetType().GetProperties())
+                    {
+                        var propertyName = property.Name;
+                        var propertyValue = property.GetValue(record);
+                        <dt>@(Char.ToUpper(propertyName[0]) + propertyName.Substring(1)):</dt>
+                        <dd>@propertyValue</dd>
+                    }
+                </dl>
+            }
+            else
+            {
+                <p>No se encontraron registros.</p>
+            }
+        }
+    }
+</div>
+
+@code {
+    Rootobject Records { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await service.SaveData();
+        }
+        catch (Exception ex)
+        {
+            Records = new();
+            Console.WriteLine(ex.Message);
+        }
+        await base.OnInitializedAsync();
+    }
+}
+
