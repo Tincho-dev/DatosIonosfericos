@@ -15,6 +15,8 @@ public class IonosferaService : IIonosferaService
 {
     private readonly IonosferaContext _context;
     private readonly string baseUrl = "http://ws-eswua.rm.ingv.it/ais.php/records/";
+    //documentation: "http://www.eswua.ingv.it/index.php/data-access-and-info/web-service"
+    //example: Url = "http://ws-eswua.rm.ingv.it/ais.php/records/wstuj2o_auto?filter=dt,eq,2022-06-15%2012:00:00";
 
     public IonosferaService(IonosferaContext context)
     {
