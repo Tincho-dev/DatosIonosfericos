@@ -3,8 +3,10 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using RestSharp;
 using System.Collections;
+using System.Linq;
 using System.Net;
 using System.Reflection;
+using static System.Collections.Specialized.BitVector32;
 using static System.Net.WebRequestMethods;
 
 namespace DatosIonosfericos.Data;
@@ -61,11 +63,27 @@ public class IonosferaService : IIonosferaService
             for (int mes = 1; mes <= 12; mes++)
             {
                 string since_date = $"{año}-{mes}-01";//YYYY-MM-DD
-                string until_date = $"{año}-{mes+1}-01";
+                string until_date = $"{año}-{mes + 1}-01";
                 string url = $"{baseUrl}{station}_auto?filter=dt,bt,{since_date}%2000:00:00,{until_date}%2023:50:00&include+dt,{station}&order=dt";
-                    
+
                 await RequestData(url);
             }
         }
     }
+
+    public async Task<IQueryable<Record>> Get(DateTime date)
+    {
+        date = date.AddDays(-1);
+        var dateStr = date.ToString("yyyy-MM-dd");
+        var records = _context.Records.Where(r => r.dt.Contains(dateStr));
+        if(!records.Any())
+        {
+            string station = "tuj2o";
+            string url = $"{baseUrl}{station}_auto?filter=dt,bt,{dateStr}%2000:00:00,{dateStr}%2023:50:00&include+dt,{station}&order=dt";
+            await RequestData(url);
+            records = _context.Records.Where(r => r.dt == date.ToString());
+        }
+        return records;
+    }
+
 }

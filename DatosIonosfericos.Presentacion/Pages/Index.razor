@@ -5,9 +5,9 @@
 <div>
     @if (
     Records == null
-    || Records.Records == null
+    || Records == null
     || 
-    !Records.Records.Any()
+    !Records.Any()
     )
     {
         <p>No hay datos para mostrar</p>
@@ -15,7 +15,7 @@
     else
     {
         
-    @foreach (Record record in Records.Records)
+    @foreach (Record record in Records)
         {
             @if (record != null)
             {
@@ -38,17 +38,17 @@
 </div>
 
 @code {
-    Rootobject Records { get; set; } = new();
+    // Rootobject Records { get; set; } = new();
+    IQueryable<Record> Records { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            await service.SaveData();
+            Records = await service.Get(DateTime.Now);
         }
         catch (Exception ex)
         {
-            Records = new();
             Console.WriteLine(ex.Message);
         }
         await base.OnInitializedAsync();
